@@ -47,7 +47,7 @@ class _CustomObjectPageState extends State<CustomObjectPage> {
       controller.remove(node.name);
     }
     node = ARKitReferenceNode(
-      url: 'models.scnassets/dash.dae',
+      url: 'models.scnassets/diplo.dae',
       scale: vector.Vector3.all(0.3),
     );
     controller.add(node, parentNodeName: anchor.nodeName);

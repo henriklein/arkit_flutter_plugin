@@ -1,24 +1,25 @@
-import 'package:arkit_plugin_example/check_support_page.dart';
-import 'package:arkit_plugin_example/custom_animation_page.dart';
-import 'package:arkit_plugin_example/custom_object_page.dart';
-import 'package:arkit_plugin_example/distance_tracking_page.dart';
-import 'package:arkit_plugin_example/custom_light_page.dart';
-import 'package:arkit_plugin_example/earth_page.dart';
-import 'package:arkit_plugin_example/hello_world.dart';
-import 'package:arkit_plugin_example/image_detection_page.dart';
-import 'package:arkit_plugin_example/light_estimate_page.dart';
-import 'package:arkit_plugin_example/manipulation_page.dart';
-import 'package:arkit_plugin_example/measure_page.dart';
-import 'package:arkit_plugin_example/network_image_detection.dart';
-import 'package:arkit_plugin_example/occlusion_page.dart';
-import 'package:arkit_plugin_example/physics_page.dart';
-import 'package:arkit_plugin_example/plane_detection_page.dart';
+import 'package:arkit_plugin_example/examples/check_support_page.dart';
+import 'package:arkit_plugin_example/examples/custom_animation_page.dart';
+import 'package:arkit_plugin_example/examples/custom_object_page.dart';
+import 'package:arkit_plugin_example/examples/distance_tracking_page.dart';
+import 'package:arkit_plugin_example/examples/custom_light_page.dart';
+import 'package:arkit_plugin_example/examples/earth_page.dart';
+import 'package:arkit_plugin_example/examples/hello_world.dart';
+import 'package:arkit_plugin_example/examples/image_detection_page.dart';
+import 'package:arkit_plugin_example/examples/light_estimate_page.dart';
+import 'package:arkit_plugin_example/examples/manipulation_page.dart';
+import 'package:arkit_plugin_example/examples/measure_page.dart';
+import 'package:arkit_plugin_example/examples/network_image_detection.dart';
+import 'package:arkit_plugin_example/examples/occlusion_page.dart';
+import 'package:arkit_plugin_example/examples/physics_page.dart';
+import 'package:arkit_plugin_example/examples/plane_detection_page.dart';
 import 'package:arkit_plugin_example/tap_page.dart';
-import 'package:arkit_plugin_example/face_detection_page.dart';
-import 'package:arkit_plugin_example/panorama_page.dart';
+import 'package:arkit_plugin_example/examples/face_detection_page.dart';
+import 'package:arkit_plugin_example/examples/panorama_page.dart';
 import 'package:arkit_plugin_example/widget_projection.dart';
-import 'package:arkit_plugin_example/real_time_updates.dart';
+import 'package:arkit_plugin_example/examples/real_time_updates.dart';
 import 'package:flutter/material.dart';
+import 'Custom.dart';
 
 void main() => runApp(MaterialApp(home: MyApp()));
 
@@ -26,6 +27,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final samples = [
+      Sample(
+        "Custom Project",
+        "combining multiple events",
+        Icons.multiline_chart,
+        () => Navigator.of(context)
+            .push<void>(MaterialPageRoute(builder: (c) => CustomProject())),
+      ),
       Sample(
         'Hello World',
         'The simplest scene with all geometries.',
