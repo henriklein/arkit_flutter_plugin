@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:holding_gesture/holding_gesture.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 
-
-
 class CustomProject extends StatefulWidget {
   @override
   _CustomProjectState createState() => _CustomProjectState();
@@ -19,6 +17,8 @@ class _CustomProjectState extends State<CustomProject> {
   String anchorId;
   int _numberOfAnchors = 0;
   bool placing = false;
+
+  vector.Vector3 lastPosition;
 
   @override
   void dispose() {
@@ -33,6 +33,7 @@ class _CustomProjectState extends State<CustomProject> {
             onARKitViewCreated: onARKitViewCreated,
             planeDetection: ARPlaneDetection.horizontal,
             showFeaturePoints: true,
+            enableTapRecognizer: true,
           ),
         ),
         floatingActionButton: HoldDetector(
@@ -55,53 +56,19 @@ class _CustomProjectState extends State<CustomProject> {
   void onARKitViewCreated(ARKitController arkitController) {
     this.arkitController = arkitController;
 
-    this.arkitController.add(_createText());
-    this.arkitController.add(_createCapsule());
-    this.arkitController.add(_createCylinder());
-    this.arkitController.add(_createTube());
-
     this.arkitController.onAddNodeForAnchor = _handleAddAnchor;
+
+    //3D Mesuring
+    this.arkitController.onARTap = (ar) {
+      final point = ar.firstWhere(
+        (o) => o.type == ARKitHitTestResultType.featurePoint,
+        orElse: () => null,
+      );
+      if (point != null) {
+        _onARTapHandler(point);
+      }
+    };
   }
-
-  ARKitNode _createText() {
-    final text = ARKitText(
-      text: 'Object #1',
-      extrusionDepth: 1,
-      materials: [
-        ARKitMaterial(
-          diffuse: ARKitMaterialProperty(color: Colors.blue),
-        )
-      ],
-    );
-    return ARKitNode(
-      geometry: text,
-      position: vector.Vector3(0.04, 0.21, -0.5),
-      scale: vector.Vector3(0.002, 0.002, 0.002),
-    );
-  }
-
-  ARKitNode _createCylinder() => ARKitNode(
-        geometry: ARKitCylinder(
-            radius: 0.04, height: 0.2, materials: _createRandomColorMaterial()),
-        position: vector.Vector3(-0, 0.1, -0.5),
-      );
-
-  ARKitNode _createTube() => ARKitNode(
-        geometry: ARKitTube(
-            innerRadius: 0.045,
-            outerRadius: 0.05,
-            height: 0.1,
-            materials: _createRandomColorMaterial()),
-        position: vector.Vector3(0, -00, -0.5),
-      );
-
-  ARKitNode _createCapsule() => ARKitNode(
-        geometry: ARKitCapsule(
-            capRadius: 0.02,
-            height: 0.06,
-            materials: _createRandomColorMaterial()),
-        position: vector.Vector3(0, 0.2, -0.5),
-      );
 
   List<ARKitMaterial> _createRandomColorMaterial() {
     return [
@@ -120,6 +87,7 @@ class _CustomProjectState extends State<CustomProject> {
       if (placing == true) {
         //if button is pressed
         _addPlane(arkitController, anchor);
+        print(anchor);
         setState(() {
           _numberOfAnchors++;
         });
@@ -150,14 +118,18 @@ class _CustomProjectState extends State<CustomProject> {
               'Now we got $_numberOfAnchors objects placed in our environment',
         )..show(context);
       }
-    } //if seeing a ground
+    }
+    ;
+    //if seeing a ground
   }
 
   void _addPlane(ARKitController controller, ARKitPlaneAnchor anchor) {
     anchorId = anchor.identifier;
+
     if (node != null) {
       // _numberOfAnchors = _numberOfAnchors-1;
     }
+
     // node = ARKitReferenceNode(
     //   url: 'models.scnassets/dash.dae',
     //   scale: vector.Vector3.all(1),
@@ -166,6 +138,73 @@ class _CustomProjectState extends State<CustomProject> {
       url: 'models.scnassets/Diplo.dae',
       scale: vector.Vector3.all(0.08),
     );
+    print(node.geometry);
     controller.add(node, parentNodeName: anchor.nodeName);
+
+  }
+
+  // Adding messuring system
+  void _onARTapHandler(ARKitTestResult point) {
+    final position = vector.Vector3(
+      point.worldTransform.getColumn(3).x,
+      point.worldTransform.getColumn(3).y,
+      point.worldTransform.getColumn(3).z,
+    );
+    print(point.distance);
+    final material = ARKitMaterial(
+        lightingModelName: ARKitLightingModel.constant,
+        diffuse: ARKitMaterialProperty(color: Colors.blue));
+    final sphere = ARKitSphere(
+      radius: 0.006,
+      materials: [material],
+    );
+    final node = ARKitNode(
+      geometry: sphere,
+      position: position,
+    );
+    arkitController.add(node);
+
+    if (lastPosition != null) {
+      final line = ARKitLine(
+        fromVector: lastPosition,
+        toVector: position,
+      );
+      final lineNode = ARKitNode(geometry: line);
+      arkitController.add(lineNode);
+
+      final distance = _calculateDistanceBetweenPoints(position, lastPosition);
+      final point = _getMiddleVector(position, lastPosition);
+      _drawText(distance, point);
+    }
+    lastPosition = position;
+  }
+
+  String _calculateDistanceBetweenPoints(vector.Vector3 A, vector.Vector3 B) {
+    final length = A.distanceTo(B);
+    return '${(length * 100).toStringAsFixed(2)} cm';
+  }
+
+  vector.Vector3 _getMiddleVector(vector.Vector3 A, vector.Vector3 B) {
+    return vector.Vector3((A.x + B.x) / 2, (A.y + B.y) / 2, (A.z + B.z) / 2);
+  }
+
+  void _drawText(String text, vector.Vector3 point) {
+    final textGeometry = ARKitText(
+      text: text,
+      extrusionDepth: 1,
+      materials: [
+        ARKitMaterial(
+          diffuse: ARKitMaterialProperty(color: Colors.red),
+        )
+      ],
+    );
+    const scale = 0.001;
+    final vectorScale = vector.Vector3(scale, scale, scale);
+    final node = ARKitNode(
+      geometry: textGeometry,
+      position: point,
+      scale: vectorScale,
+    );
+    arkitController.add(node);
   }
 }
