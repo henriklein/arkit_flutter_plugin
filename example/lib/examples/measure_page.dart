@@ -45,6 +45,7 @@ class _MeasurePageState extends State<MeasurePage> {
       point.worldTransform.getColumn(3).y,
       point.worldTransform.getColumn(3).z,
     );
+    print(position);
     final material = ARKitMaterial(
         lightingModelName: ARKitLightingModel.constant,
         diffuse: ARKitMaterialProperty(color: Colors.blue));
