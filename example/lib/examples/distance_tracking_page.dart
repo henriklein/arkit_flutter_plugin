@@ -23,7 +23,7 @@ class _DistanceTrackingPageState extends State<DistanceTrackingPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-
+      
         body: Container(
           child: ARKitSceneView(
             showFeaturePoints: true,
@@ -36,7 +36,7 @@ class _DistanceTrackingPageState extends State<DistanceTrackingPage> {
 
   void onARKitViewCreated(ARKitController arkitController) {
     this.arkitController = arkitController;
-    this.arkitController.onAddNodeForAnchor = _handleAddAnchorDistance;
+    this.arkitController.onAddNodeForAnchor = _handleAddAnchor;
     this.arkitController.onUpdateNodeForAnchor = _handleUpdateAnchor;
     this.arkitController.onARTap = (List<ARKitTestResult> ar) {
       final planeTap = ar.firstWhere(
@@ -49,11 +49,11 @@ class _DistanceTrackingPageState extends State<DistanceTrackingPage> {
     };
   }
 
-  void _handleAddAnchorDistance(ARKitAnchor anchor) {
+  void _handleAddAnchor(ARKitAnchor anchor) {
     if (!(anchor is ARKitPlaneAnchor)) {
       return;
     }
-    _addPlaneDistance(arkitController, anchor);
+    _addPlane(arkitController, anchor);
   }
 
   void _handleUpdateAnchor(ARKitAnchor anchor) {
@@ -67,7 +67,7 @@ class _DistanceTrackingPageState extends State<DistanceTrackingPage> {
     plane.height.value = planeAnchor.extent.z;
   }
 
-  void _addPlaneDistance(ARKitController controller, ARKitPlaneAnchor anchor) {
+  void _addPlane(ARKitController controller, ARKitPlaneAnchor anchor) {
     anchorId = anchor.identifier;
     plane = ARKitPlane(
       width: anchor.extent.x,
