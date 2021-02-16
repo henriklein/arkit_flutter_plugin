@@ -19,10 +19,7 @@ class _MeasurePageState extends State<MeasurePage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(
-        title: const Text('Measure Sample'),
-      ),
-      body: Container(
+          body: Container(
         child: ARKitSceneView(
           enableTapRecognizer: true,
           onARKitViewCreated: onARKitViewCreated,
